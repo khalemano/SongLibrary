@@ -60,7 +60,7 @@ libApp.controller('SongListController', ['$scope', '$http', function SongListCon
 		$http.post(serverUrl, songJson, {headers:headers}).then(function successCallback(response){
 			$scope.saveInProgress = false;
 			$scope.saveStatus = "SUCCESS";
-			$scope.saveStatusMsg = "SAVED SUCCESSFULLY";
+			$scope.saveStatusMsg = "SAVED SUCCESSFULLY.";
 		}, function errorCallback(response){
 			$scope.saveInProgress = false;
 			$scope.saveStatus = "ERROR";
