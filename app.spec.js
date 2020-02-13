@@ -51,7 +51,7 @@ describe('Test for song library', function() {
 			$httpBackend.flush();
 			
 			expect(scope.saveStatus).toBe('SUCCESS');
-			expect(scope.saveStatusMsg).toBe('SAVED SUCCESSFULLY');
+			expect(scope.saveStatusMsg).toBe('SAVED SUCCESSFULLY.');
 		});
 		
 		it('sets save status to ERROR when save fails', function(){
