@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+
+<html ng-app="songLibraryApp">
+
+<head>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<link rel="stylesheet" href="index.css">
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.js"></script>
+<script src="app.min.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+<body ng-controller="SongListController">
+<div class="container">
+	<div class="row">
+		<div class="col">
+			<h1 class="font-weight-bold">Song Library</h1>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-6">
+			<label>Filter by release date:</label><br>
+			<label>From:</label>
+			<input type="date" class="form-control" ng-class="{'is-invalid': !releaseDateRangeValid}" ng-model="releaseDateRangeStart" />
+			<label>To:</label>
+			<input type="date" class="form-control" ng-class="{'is-invalid': !releaseDateRangeValid}" ng-model="releaseDateRangeEnd" />
+			<div class="invalid-feedback">Date range start must be before date range end</div>
+			<button type="submit" class="btn btn-info mt-3" ng-click="applyReleaseDateRange()">APPLY</button>	
+		</div>
+	</div>
+	<br>
+	<div class="row">
+		<div class="col">
+			<span>Active Filters: </span>
+			<span class="badge badge-secondary" ng-show="noFiltersApplied()">None</span>
+			<span class="badge badge-clickable badge-info" ng-show="hasReleaseDateFilter()" ng-click="clearReleaseDateFilter()">
+				Release Date: {{appliedReleaseDateRangeStart | date:'MM/dd/yyyy'}} - {{appliedReleaseDateRangeEnd | date:'MM/dd/yyyy'}} 
+				<span class="badge-close">&times;</span>
+			</span>
+		</div>
+	</div>
+	<br>
+	<div class="row">
+		<div class="col">
+			<div class="table-responsive-sm">
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th scope="col" ng-click="sortBy('title')">
+							Title
+							<span class="sortsymbol" ng-class="{sortactive: propertyName === 'title', sortreverse: reverse}"></span>
+						</th>
+						<th scope="col" ng-click="sortBy('artist')">
+							Artist
+							<span class="sortsymbol" ng-class="{sortactive: propertyName === 'artist', sortreverse: reverse}"></span>
+						</th>
+						<th scope="col" ng-click="sortBy('releaseDateObj')">
+							Release Date
+							<span class="sortsymbol" ng-class="{sortactive: propertyName === 'releaseDateObj', sortreverse: reverse}"></span>
+						</th>
+						<th scope="col" ng-click="sortBy('price')">
+							Price
+							<span class="sortsymbol" ng-class="{sortactive: propertyName === 'price', sortreverse: reverse}"></span>
+						</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="song in getSongArray() | filter:releaseDateFilter | orderBy:propertyName:reverse">
+						<td>{{song.title}}</td>
+						<td>{{song.artist}}</td>
+						<td>{{song.releaseDateObj | date:'MM/dd/yyyy'}}</td>
+						<td>{{song.price | currency:"$":2}}</td>
+						<td>
+							<button ng-click="prepModalForUpdate(song)" onclick="showSongEditModal()">
+								<span>&#x1F4DD;</span>
+							</button>
+							<button ng-click="prepModelForDelete(song)" onclick="showSongDeleteModal()">
+								<span>&#x2716;</span>
+							</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</div>
+		</div>
+	</div>
+	<div class ="row">
+		<div class="col">
+			<button class="btn btn-info" ng-click="prepModalForAdd()" onclick="showSongEditModal()">ADD SONG</button>
+			<button class="btn btn-info" ng-click="saveSongList()">SAVE LIST</button>
+			<img class="img-fluid" ng-show="saveInProgress" style="height:40px" src="inprogress.gif" alt="in-progress" />
+			<div class="alert alert-dismissible fade show" ng-show="saveStatusMsg" ng-class="{'alert-success': saveStatus === 'SUCCESS', 'alert-danger': saveStatus === 'ERROR'}" role="alert">
+				{{saveStatusMsg}}
+				<button type="button" class="close" aria-label="Close" ng-click="clearSaveStatusMsg()">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="song-edit-modal" class="modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title font-weight-bold">{{songEditModalTitle}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      	<form name="songEditForm" id="song-edit-form" onsubmit="hideSongEditModal()" novalidate>
+		  <div class="modal-body">
+			<label>Title *</label>
+			<input type="text" name="title" class="form-control" ng-class="{'is-invalid': !songEditTitleValid}" ng-model="pending.title" required/>
+			<div class="invalid-feedback">Please provide a title.</div><br>
+			<label>Artist</label>
+			<input type="text" class="form-control" ng-model="pending.artist"/><br>
+			<label>Release Date</label>
+			<input type="date" class="form-control" ng-model="pending.releaseDateObj" /><br>
+			<label>Price (USD)</label>
+			<input type="number" class="form-control" ng-model="pending.price" step="0.01" onchange="this.value = round(this.value,2);" /><br>
+		  </div>
+		  <div class="modal-footer">
+			<button type="submit" ng-show="songEditModalMode === 'ADD'" class="btn btn-info" ng-click="commitAdd()">Add</button>
+			<button type="submit" ng-show="songEditModalMode === 'UPDATE'" class="btn btn-info" ng-click="commitUpdate()">Update</button>
+			<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+		  </div>
+		</form>
+    </div>
+  </div>
+</div>
+
+<div id="song-delete-modal" class="modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title font-weight-bold">Are you sure?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete '{{songForDelete.title}}' ?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" ng-click="deleteSong(songForDelete.id)" onclick="hideSongDeleteModal()">Delete</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+
+<script>
+function showSongEditModal(){
+	$('#song-edit-modal').modal('show');
+}
+
+function hideSongEditModal(){
+	if ($('#song-edit-form').hasClass('ng-valid')){
+		$('#song-edit-modal').modal('hide');
+	}
+}
+
+function showSongDeleteModal(){
+	$('#song-delete-modal').modal('show');
+}
+
+function hideSongDeleteModal(){
+	$('#song-delete-modal').modal('hide');
+}
+
+// Rounds a number to the specified decimal places
+function round(number, decimalPlaces) {
+	var multiplier = 10**decimalPlaces;
+	return Math.round(number*multiplier)/multiplier;
+}
+</script>
+
+</html>

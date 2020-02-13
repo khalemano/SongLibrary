@@ -1,0 +1,51 @@
+
+thead,.modal-header {
+	background-color: #ebefe3;
+}
+
+.alert {
+	display:inline-block;
+}
+
+button, input, label, th, td, h5, h1 {
+	font-family: museo-sans, sans-serif;
+	color: #4c4d4f;	
+}
+
+.badge-close {
+	font-size:120%;
+}
+
+.badge-clickable:hover{
+	cursor: pointer;
+}
+
+.badge:hover .badge-close{
+	color: red;
+}
+
+.btn {
+	border-radius: 0px;
+}
+
+th {
+	text-align: center;
+	vertical-align: bottom;
+}
+
+td {
+	text-align: center;
+	vertical-align: top;
+}
+
+.sortsymbol:after{
+	content: '\2666	'; // BLACK DIAMOND
+}
+
+.sortsymbol.sortactive:after{
+	content: '\25b2'; // BLACK UP-POINTING TRIANGLE
+}
+
+.sortsymbol.sortactive.sortreverse:after{
+	content: '\25bc'; // BLACK DOWN-POINTING TRIANGLE
+}
