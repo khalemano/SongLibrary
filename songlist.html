@@ -19,6 +19,13 @@
 <div class="container">
 	<div class="row">
 		<div class="col">
+			<div class="alert" ng-show="initialLoadErrorMsg" ng-class="{'alert-danger':initialLoadErrorMsg}" role="alert">
+  				{{initialLoadErrorMsg}}
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col">
 			<h1 class="font-weight-bold">Song Library</h1>
 		</div>
 	</div>
@@ -90,17 +97,21 @@
 			</div>
 		</div>
 	</div>
-	<div class ="row">
+	<div class="row">
 		<div class="col">
-			<button class="btn btn-info" ng-click="prepModalForAdd()" onclick="showSongEditModal()">ADD SONG</button>
-			<button class="btn btn-info" ng-click="saveSongList()">SAVE LIST</button>
-			<img class="img-fluid" ng-show="saveInProgress" style="height:40px" src="inprogress.gif" alt="in-progress" />
 			<div class="alert alert-dismissible fade show" ng-show="saveStatusMsg" ng-class="{'alert-success': saveStatus === 'SUCCESS', 'alert-danger': saveStatus === 'ERROR'}" role="alert">
 				{{saveStatusMsg}}
 				<button type="button" class="close" aria-label="Close" ng-click="clearSaveStatusMsg()">
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
+		</div>
+	</div>
+	<div class ="row">
+		<div class="col">
+			<button class="btn btn-info" ng-click="prepModalForAdd()" onclick="showSongEditModal()">ADD SONG</button>
+			<button class="btn btn-info" ng-click="saveSongList()">SAVE LIST</button>
+			<img class="img-fluid" ng-show="saveInProgress" style="height:40px" src="inprogress.gif" alt="in-progress" />
 		</div>
 	</div>
 </div>

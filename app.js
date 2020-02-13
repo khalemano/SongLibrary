@@ -4,6 +4,9 @@ var libApp = angular.module('songLibraryApp', []);
 // Defines the SongListController
 libApp.controller('SongListController', ['$scope', '$http', function SongListController($scope, $http){
 	var serverUrl = "https://www.khalemano.com/songlist";
+	
+	$scope.initialLoadErrorMsg = ""; // Error message shown if initial data load fails.
+	
 	$scope.songs = {}; // Stores the model internal state, indexed by song id.
 	$scope.pending = {}; // Bound to the song add and update modal.
 	$scope.pendingAdd = {}; // Stores uncommitted information from the song add modal.
@@ -27,12 +30,14 @@ libApp.controller('SongListController', ['$scope', '$http', function SongListCon
 	$scope.saveStatus = "SUCCESS"; // "SUCCESS" or "ERROR" based on the save async call.
 	$scope.saveStatusMsg = undefined; // Message given to user after save async call returns.
 	
-	$http.get(serverUrl).then(function(response){
+	$http.get(serverUrl).then(function successCallback(response){
 		$scope.songs = processResponseData(response.data);
-	},function(response){
-		console.log(response);
+	},function errorCallback(response){
+		$scope.initialLoadErrorMsg = "Error occurred while loading song data.  Please try reloading.";
 	});
 	
+	// Processes song data from server.
+	// Indexes the song by id and converts date strings into date objects.
 	function processResponseData(songList){
 		var model = {};
 		songList.forEach(function(e){
@@ -46,6 +51,7 @@ libApp.controller('SongListController', ['$scope', '$http', function SongListCon
 		return model;
 	}
 	
+	// Sends songs to server.
 	$scope.saveSongList = function(){
 		var songJson = getSongListAsJson();
 		var headers = {'Content-Type':'text/plain'}
@@ -62,10 +68,13 @@ libApp.controller('SongListController', ['$scope', '$http', function SongListCon
 		});
 	}
 	
+	// Removes the save status message.
 	$scope.clearSaveStatusMsg = function(){
 		$scope.saveStatusMsg = undefined;
 	}
 	
+	// Puts song data into JSON format prior to save.
+	// Converts data objects into date strings.
 	function getSongListAsJson(){
 		var songList = Object.values($scope.songs).map(function(e){
 			var songDetails = {};
@@ -100,7 +109,7 @@ libApp.controller('SongListController', ['$scope', '$http', function SongListCon
 		}
 	}
 	
-	// Used by angular to filter the song library
+	// Used by angular to filter the song library.
 	$scope.releaseDateFilter = function(value){
 		var date = value['releaseDateObj'];
 		var start = $scope.appliedReleaseDateRangeStart;
@@ -119,45 +128,52 @@ libApp.controller('SongListController', ['$scope', '$http', function SongListCon
 		}
 	}
 	
+	// Removes the release date filter.
 	$scope.clearReleaseDateFilter = function(){
 		$scope.appliedReleaseDateRangeStart = undefined;
 		$scope.appliedReleaseDateRangeEnd = undefined;		
 	}
 	
+	// Checks whether the release date filter is applied.
 	$scope.hasReleaseDateFilter = function(){
 		return ($scope.appliedReleaseDateRangeStart || $scope.appliedReleaseDateRangeEnd) ? true : false;
 	}
 	
+	// Checks that no filers are applied.
+	// Add to this method as more filters are created.
 	$scope.noFiltersApplied = function(){
 		return !$scope.hasReleaseDateFilter();
 	}
 	
-	// Returns the song library as an array
+	// Returns the song library as an array.
 	$scope.getSongArray = function(){
 		return Object.values($scope.songs);
 	}
 	
+	// Determines which property to sort on and whether the sort is ascending or descending.
 	$scope.sortBy = function(propertyName){
 		$scope.reverse = $scope.propertyName === propertyName ? !$scope.reverse : false;
 		$scope.propertyName = propertyName;
 	}
 	
+	// Sets song for the delete confirmation modal.
 	$scope.prepModelForDelete = function(song){
 		$scope.songForDelete = song;
 	}
 	
-	// Deletes a song from the library
+	// Deletes a song from the library.
 	$scope.deleteSong = function(id){
 		delete $scope.songs[id];
 	};
 	
+	// Sets song for the add song modal.
 	$scope.prepModalForAdd = function(){
 		$scope.pending = $scope.pendingAdd;
 		$scope.songEditModalMode = "ADD";
 		$scope.songEditModalTitle = "Add Song";
 		$scope.songEditTitleValid = true;
 	}
-		
+	
 	function checkSongTitleValidity(){
 		if($scope.pending['title']){ 
 			return true;
@@ -166,6 +182,7 @@ libApp.controller('SongListController', ['$scope', '$http', function SongListCon
 		}
 	}
 	
+	// Saves song to song list if it is valid.
 	$scope.commitAdd = function(){
 		$scope.songEditTitleValid = checkSongTitleValidity();
 		if ($scope.songEditTitleValid){
@@ -179,6 +196,7 @@ libApp.controller('SongListController', ['$scope', '$http', function SongListCon
 		}
 	}
 	
+	// Sets song for the update modal.
 	$scope.prepModalForUpdate = function(songDetails){
 		$scope.pending =  angular.copy(songDetails);
 		$scope.songEditModalMode = "UPDATE";
@@ -186,6 +204,7 @@ libApp.controller('SongListController', ['$scope', '$http', function SongListCon
 		$scope.songEditTitleValid = true;
 	}
 	
+	// Updates song in song list if it is valid.
 	$scope.commitUpdate = function commitUpdate(){
 		$scope.songEditTitleValid = checkSongTitleValidity();
 		if ($scope.songEditTitleValid){
@@ -211,7 +230,7 @@ libApp.controller('SongListController', ['$scope', '$http', function SongListCon
 		}	
 	}
 	
-	// Generates UUIDs
+	// Generates UUIDs.
 	function uuidv4() {
 	  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
 		var r = Math.floor(Math.random() * 16);
@@ -219,12 +238,12 @@ libApp.controller('SongListController', ['$scope', '$http', function SongListCon
 	  });
 	}
 	
-	//Formats a date string to yyyy-mm-dd format
+	//Formats a date string to yyyy-mm-dd format.
 	function formatDateString(date){
 		return date.toISOString().split('T')[0];
 	}
 	
-	//Populates a Date instance from a string in yyyy-mm-dd format
+	//Populates a Date instance from a string in yyyy-mm-dd format.
 	function parseDate(dateString){
 		var dateParts = dateString.split("-").map(x=>parseInt(x));
 		var date = new Date();

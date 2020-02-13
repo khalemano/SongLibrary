@@ -1,10 +1,26 @@
 describe('Test for song library', function() {
-	var serverUrl = "http://songlibrary.us-west-1.elasticbeanstalk.com/songlist";
+	var serverUrl = "https://www.khalemano.com/songlist";
 
 	beforeEach(module('songLibraryApp'));
 	
+	describe('SongListController with failed initial load', function(){
+		var $httpBackend, scope;
+		
+		beforeEach(inject(function($controller, _$httpBackend_){
+			scope = {};
+			$httpBackend = _$httpBackend_;
+			$httpBackend.expectGET(serverUrl).respond(500, 'failure');
+			$controller('SongListController', {$scope:scope});
+			$httpBackend.flush();
+		}));
+		
+		it('sets the error message for the user', function(){
+			expect(scope.initialLoadErrorMsg).toBe("Error occurred while loading song data.  Please try reloading.");
+		});
+	});
+	
 	describe('SongListController', function(){
-		var $httpBackend, ctrl, scope;
+		var $httpBackend, scope;
 		var id = "400ec33b-6eb3-438c-a333-af8e2322c8a3";
 		var title = "Mr. Blue Sky";
 		var artist = "Electric Light Orchestra";
@@ -16,9 +32,8 @@ describe('Test for song library', function() {
 			scope = {};
 			$httpBackend = _$httpBackend_;
 			$httpBackend.expectGET(serverUrl).respond(data);
-			ctrl = $controller('SongListController', {$scope:scope});
+			$controller('SongListController', {$scope:scope});
 			$httpBackend.flush();
-			//console.log(scope);
 		}));
 	
 		it('populates the song list', function(){
@@ -147,6 +162,95 @@ describe('Test for song library', function() {
 			
 			expect(scope.songs).toEqual({});
 			expect(scope.getSongArray()).toEqual([]);
+		});
+		
+		describe('Add Song Procedure', function(){
+		
+			beforeEach(function(){
+				scope.prepModalForAdd();
+			});
+			
+			it('prepped the edit modal for adding a song', function(){
+				expect(scope.songEditModalMode).toBe("ADD");
+				expect(scope.songEditModalTitle).toBe("Add Song");
+				expect(scope.songEditTitleValid).toBeTrue();
+			});
+			
+			it('adds a song to the song list', function(){
+				// Deleting current song to make it easier to locate the added song.
+				scope.deleteSong(id);
+				var titleForAdd = 'UNIQUE_SONG_TITLE';
+				scope.pending['title'] = titleForAdd;
+				
+				scope.commitAdd();
+				
+				expect(scope.songEditTitleValid).toBeTrue();
+				expect(scope.getSongArray()[0]['title']).toBe(titleForAdd);
+			});
+			
+			it('does not add song if title is missing', function(){
+				// Deleting current song to make it easier to locate the added song.
+				scope.deleteSong(id);
+				
+				scope.commitAdd();
+				
+				expect(scope.songEditTitleValid).toBeFalse();
+				expect(scope.getSongArray().length).toBe(0);
+			});
+			
+			it('modal data gets replaced if modal mode switches to update', function(){
+				var titleForAdd = 'UNIQUE_SONG_TITLE';
+				scope.pending['title'] = titleForAdd;
+				
+				scope.prepModalForUpdate(scope.songs[id]);
+				
+				expect(scope.pending).toEqual(scope.songs[id]);
+			});
+			
+			it('restores add data after modal mode switches to update and back to add', function(){
+				var titleForAdd = 'UNIQUE_SONG_TITLE';
+				scope.pending['title'] = titleForAdd;
+				
+				scope.prepModalForUpdate(scope.songs[id]);
+				scope.prepModalForAdd();
+				
+				expect(scope.pending['title']).toBe(titleForAdd);
+			});
+			
+		});
+		
+		describe('Update Song Procedure', function(){
+		
+			beforeEach(function(){
+				scope.prepModalForUpdate(scope.songs[id]);
+			});
+			
+			it('preps the modal for update', function(){
+				expect(scope.songEditModalMode).toBe("UPDATE");
+				expect(scope.songEditModalTitle).toBe("Update Song");
+				expect(scope.songEditTitleValid).toBeTrue();
+			});
+			
+			it('updates the song', function(){
+				var titleForUpdate = 'UNIQUE_SONG_TITLE';
+				scope.pending['title'] = titleForUpdate;
+			
+				scope.commitUpdate();
+				
+				expect(scope.songEditTitleValid).toBeTrue();
+				expect(scope.songs[id]['title']).toBe(titleForUpdate);
+			});
+			
+			it('does not update with an empty title', function(){
+				var titleForUpdate = '';
+				scope.pending['title'] = titleForUpdate;
+				
+				scope.commitUpdate();
+				
+				expect(scope.songEditTitleValid).toBeFalse();
+				expect(scope.songs[id]['title']).toBe(title);
+			});
+		
 		});
 	
 	});
