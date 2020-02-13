@@ -3,7 +3,7 @@ var libApp = angular.module('songLibraryApp', []);
 
 // Defines the SongListController
 libApp.controller('SongListController', ['$scope', '$http', function SongListController($scope, $http){
-	var serverUrl = "http://songlibrary.us-west-1.elasticbeanstalk.com/songlist";
+	var serverUrl = "https://www.khalemano.com/songlist";
 	$scope.songs = {}; // Stores the model internal state, indexed by song id.
 	$scope.pending = {}; // Bound to the song add and update modal.
 	$scope.pendingAdd = {}; // Stores uncommitted information from the song add modal.
