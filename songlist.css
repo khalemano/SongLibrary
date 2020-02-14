@@ -34,7 +34,7 @@ td {
 }
 
 .sortsymbol:after{
-	content: '\2666	'; // BLACK DIAMOND
+	content: '\2B25	'; // BLACK DIAMOND
 }
 
 .sortsymbol.sortactive:after{
