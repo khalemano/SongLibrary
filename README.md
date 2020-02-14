@@ -9,6 +9,7 @@ The frontend was written using the [AngularJS framework](https://angularjs.org/)
 I chose AngularJS because it provides a comprehensive model-view-controller system in the frontend.
 This keeps the view (songlist.html) concerned with the html layout and allows the heavy lifting to be done by the controller (app.min.js).
 This also makes it easy to reuse certain html elements, for example, the modal that adds a song uses the same html elements as the modal that updates an existing song.
+AngularJS also provides mechanisms that make sorting and filtering the items in the view easy.
 Because so much of the logic is contained in the javascript file, I included the non-minimized version in this github repo (app.js) for your review.
 
 ## CSS
