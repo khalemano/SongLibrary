@@ -4,7 +4,7 @@ Here is a link to the [SongLibrary app hosted on Github Pages](https://khalemano
 You should also be able to run the songlist.html page locally by cloning the repository.
 The following sections explain the structure of the app and the decisions that went into its creation.
 
-## Frontend Logic
+## Frontend
 The frontend was written using the [AngularJS framework](https://angularjs.org/).
 I chose AngularJS because it provides a comprehensive model-view-controller system in the frontend.
 This keeps the view (songlist.html) concerned with the html layout and allows the heavy lifting to be done by the controller (app.min.js).
