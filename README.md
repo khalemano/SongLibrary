@@ -28,3 +28,7 @@ You can run the tests by viewing the [SpecRunner page](https://khalemano.github.
 The backend of the app is a [Glassfish server](https://javaee.github.io/glassfish) hosted on [Amazon Web Services (AWS)](https://aws.amazon.com/) that serves a static song list, that way you can reset the song list by refreshing your browser.
 In order for Github Pages to make asynchronous calls to my AWS server, I set up an HTTPS connection and used the [Access-Control-Allow-Origin HTTP header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin) to allow cross-origin requests.
 As requested, the servlet was programmed to randomly fail 1/5 of the save attempts.
+
+## Song IDs
+I did not display song IDs for the user because I did not feel it would be useful information for them.
+Instead I use the IDs as unique identifiers in the background and generate new ones when a new song is added.
