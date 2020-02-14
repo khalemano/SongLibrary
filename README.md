@@ -15,7 +15,7 @@ Because so much of the logic is contained in the javascript file, I included the
 The style of the page was coded using [Bootstrap](https://getbootstrap.com/).
 I decided to use Bootstrap because of its layout system and its widgets, such as the alerts, badges, and modals.
 The Bootstrap modal was utilized to create a popup to gather song information from the user when the user wants to update or add a song.
-Some modifications were made to the CSS to conform more to the style of the [PERA website](https://www.copera.org).
+Some modifications were made to the CSS to conform more to the style of the [PERA website](https://www.copera.org/members/has-tables).
 
 ## Tests
 The unit tests were written in [Jasmine](https://jasmine.github.io/index.html) using the standalone spec runner.
