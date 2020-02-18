@@ -43,7 +43,7 @@
 	<br>
 	<div class="row">
 		<div class="col">
-			<span>Active Filters: </span>
+			<label>Active Filters: </label>
 			<span class="badge badge-secondary" ng-show="noFiltersApplied()">None</span>
 			<span class="badge badge-clickable badge-info" ng-show="hasReleaseDateFilter()" ng-click="clearReleaseDateFilter()">
 				Release Date: {{appliedReleaseDateRangeStart | date:'MM/dd/yyyy'}} - {{appliedReleaseDateRangeEnd | date:'MM/dd/yyyy'}} 
@@ -51,52 +51,30 @@
 			</span>
 		</div>
 	</div>
-	<br>
 	<div class="row">
 		<div class="col">
-			<div class="table-responsive-sm">
-			<table class="table table-bordered">
-				<thead>
-					<tr>
-						<th scope="col" ng-click="sortBy('title')">
-							Title
-							<span class="sortsymbol" ng-class="{sortactive: propertyName === 'title', sortreverse: reverse}"></span>
-						</th>
-						<th scope="col" ng-click="sortBy('artist')">
-							Artist
-							<span class="sortsymbol" ng-class="{sortactive: propertyName === 'artist', sortreverse: reverse}"></span>
-						</th>
-						<th scope="col" ng-click="sortBy('releaseDateObj')">
-							Release Date
-							<span class="sortsymbol" ng-class="{sortactive: propertyName === 'releaseDateObj', sortreverse: reverse}"></span>
-						</th>
-						<th scope="col" ng-click="sortBy('price')">
-							Price
-							<span class="sortsymbol" ng-class="{sortactive: propertyName === 'price', sortreverse: reverse}"></span>
-						</th>
-						<th>Actions</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr ng-repeat="song in getSongArray() | filter:releaseDateFilter | orderBy:propertyName:reverse">
-						<td>{{song.title}}</td>
-						<td>{{song.artist}}</td>
-						<td>{{song.releaseDateObj | date:'MM/dd/yyyy'}}</td>
-						<td>{{song.price | currency:"$":2}}</td>
-						<td>
-							<button ng-click="prepModalForUpdate(song)" onclick="showSongEditModal()">
-								<span>&#x1F4DD;</span>
-							</button>
-							<button ng-click="prepModelForDelete(song)" onclick="showSongDeleteModal()">
-								<span>&#x2716;</span>
-							</button>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			</div>
+			<label>Sort by </label>
+			<select ng-options="option.display for option in sortOptions track by option.display" ng-model="selectedSortOption"></select>
 		</div>
 	</div>
+	
+	<div class="row border-top pt-1 pb-1" ng-repeat="song in getSongArray() | filter:releaseDateFilter | orderBy:selectedSortOption.property:selectedSortOption.reverse">
+		<div class="col-5 col-md-3 order-md-1 font-weight-bold text-left text-truncate">{{song.title}}</div>
+		<div class="col-5 col-md-2 order-md-4 text-center text-truncate">{{song.price | currency:"$":2}}</div>
+		<div class="col-2 col-md-1 order-md-5 text-center">
+			<button ng-click="prepModalForUpdate(song)" onclick="showSongEditModal()">
+				<img src="img/pencil.svg">
+			</button>
+		</div>
+		<div class="col-5 col-md-3 order-md-2 text-left text-truncate">{{song.artist}}</div>
+		<div class="col-5 col-md-2 order-md-3 text-center text-truncate">{{song.releaseDateObj | date:'MM/dd/yyyy'}}</div>
+		<div class="col-2 col-md-1 order-md-6 text-center">
+			<button ng-click="prepModelForDelete(song)" onclick="showSongDeleteModal()">
+				<img src="img/x.svg">
+			</button>
+		</div>
+	</div>
+	
 	<div class="row">
 		<div class="col">
 			<div class="alert alert-dismissible fade show" ng-show="saveStatusMsg" ng-class="{'alert-success': saveStatus === 'SUCCESS', 'alert-danger': saveStatus === 'ERROR'}" role="alert">
@@ -111,7 +89,7 @@
 		<div class="col">
 			<button class="btn btn-info" ng-click="prepModalForAdd()" onclick="showSongEditModal()">ADD SONG</button>
 			<button class="btn btn-info" ng-click="saveSongList()">SAVE LIST</button>
-			<img class="img-fluid" ng-show="saveInProgress" style="height:40px" src="inprogress.gif" alt="in-progress" />
+			<img class="img-fluid" ng-show="saveInProgress" style="height:40px" src="img/inprogress.gif" alt="in-progress" />
 		</div>
 	</div>
 </div>
