@@ -11,19 +11,9 @@ libApp.controller('SongListController', ['$scope', '$http', function SongListCon
 	$scope.pending = {}; // Bound to the song add and update modal.
 	$scope.pendingAdd = {}; // Stores uncommitted information from the song add modal.
 	
-	// Stores the options for sorting songs
-	$scope.sortOptions=[
-		{"display":"Title (A-Z)", "property": "title", "reverse": false},
-		{"display":"Title (Z-A)", "property": "title", "reverse": true},
-		{"display":"Artist (A-Z)", "property": "artist", "reverse": false},
-		{"display":"Artist (Z-A)", "property": "artist", "reverse": true},
-		{"display":"Release Date (Oldest-Newest)", "property": "releaseDateObj", "reverse": false},
-		{"display":"Release Date (Newest-Oldest)", "property": "releaseDateObj", "reverse": true},
-		{"display":"Price (Lowest-Highest)", "property": "price", "reverse": false},
-		{"display":"Price (Highest-Lowest)", "property": "price", "reverse": true},
-	];
-	$scope.selectedSortOption = $scope.sortOptions[0]; // Bound to the current selected sort option
-		
+	$scope.propertyName = "title"; // Determines which song property to sort on.
+	$scope.reverse = false; // Determines whether sort should be ascending or descending.
+	
 	$scope.releaseDateRangeStart; // Bound to release date filter input.
 	$scope.releaseDateRangeEnd; // Bound to release date filter input.
 	$scope.releaseDateRangeValid = true; // Indicates whether release date filter is valid.
@@ -159,7 +149,13 @@ libApp.controller('SongListController', ['$scope', '$http', function SongListCon
 	$scope.getSongArray = function(){
 		return Object.values($scope.songs);
 	}
-		
+	
+	// Determines which property to sort on and whether the sort is ascending or descending.
+	$scope.sortBy = function(propertyName){
+		$scope.reverse = $scope.propertyName === propertyName ? !$scope.reverse : false;
+		$scope.propertyName = propertyName;
+	}
+	
 	// Sets song for the delete confirmation modal.
 	$scope.prepModelForDelete = function(song){
 		$scope.songForDelete = song;

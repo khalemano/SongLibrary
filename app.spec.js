@@ -135,7 +135,22 @@ describe('Test for song library', function() {
 			});
 		
 		});
-				
+		
+		it('sets the sort propertyName', function(){
+			scope.sortBy('artist');
+			
+			expect(scope.propertyName).toBe('artist');
+			expect(scope.reverse).toBeFalse();
+		});
+		
+		it('sets the sort direction to reverse if the same property is clicked twice', function(){
+			scope.sortBy('artist');
+			scope.sortBy('artist');
+			
+			expect(scope.propertyName).toBe('artist');
+			expect(scope.reverse).toBeTrue();
+		});
+		
 		it('sets the songForDelete for the confirmation modal', function(){
 			scope.prepModelForDelete(data[0]);
 			
