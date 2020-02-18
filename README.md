@@ -15,6 +15,7 @@ Because so much of the logic is contained in the javascript file, I included the
 ## CSS
 The style of the page was coded using [Bootstrap](https://getbootstrap.com/).
 I decided to use Bootstrap because of its layout system and its widgets, such as the alerts, badges, and modals.
+I used the Bootstrap grid system to display the song attributes in responsive columns that rearrange when viewed on a smaller device such a phone.
 The Bootstrap modal was utilized to create a popup to gather song information from the user when the user wants to update or add a song.
 Some modifications were made to the CSS to conform more to the style of the [PERA website](https://www.copera.org/members/has-tables).
 
